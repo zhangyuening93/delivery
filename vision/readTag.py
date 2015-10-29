@@ -37,7 +37,7 @@ class TagInfo(object):
 		self._camera = PiCamera()
 		self._camera.resolution = (640, 480)
 		self._camera.framerate = 32
-		self._rawCapture = PiRGBArray(camera,size = (640,480))
+		self._rawCapture = PiRGBArray(self._camera,size = (640,480))
 
 		# warm up camera
 		time.sleep(0.1)
@@ -55,7 +55,7 @@ class TagInfo(object):
 
 	def Capture(self):
 		# capure frame once
-		self._camera.capure(self._rawCapture, format="bgr")
+		self._camera.capture(self._rawCapture, format="bgr")
 		frame = self._rawCapture.array
 		self.process(frame)
 		self._rawCapture.truncate(0)
@@ -120,7 +120,7 @@ class TagInfo(object):
 				threshInv = cv2.flip(threshInv,flipCode = 0)
 				threshInv = cv2.transpose(threshInv)
 				threshInv = cv2.flip(threshInv,flipCode = 0)
-				angle = angle
+				angle = angle + 180
 			elif point_value == self._orientation_flag[3]:
 				thresh = cv2.transpose(thresh)
 				thresh = cv2.flip(thresh,flipCode = 1)
@@ -152,7 +152,7 @@ class TagInfo(object):
 			# cv2.imshow("Cropped",p_image)
 
 		# show the frame
-		cv2.imshow("Tracking", frame)
+		# cv2.imshow("Tracking", frame)
 		# cv2.waitKey(0)
 	
 	
