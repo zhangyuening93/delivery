@@ -132,4 +132,3 @@ for image_raw in camera.capture_continuous(rawCapture, format="bgr",use_video_po
 	# if the 'q' key is pressed, stop the loop
 	if cv2.waitKey(1) & 0xFF == ord("q"):
 		break
-file:///home/pi/project/delivery/vision/readTag.py
