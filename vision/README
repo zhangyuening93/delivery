@@ -3,3 +3,25 @@ Ref:
 http://www.pyimagesearch.com/2015/03/30/accessing-the-raspberry-pi-camera-with-opencv-and-python/
 
 http://robertcastle.com/2014/02/installing-opencv-on-a-raspberry-pi/
+
+
+Upon powering up, run main.py
+
+In main.py,
+1. readMap("Map.txt")
+2. initialize socket, run server
+3. while(1)
+	listen(1)
+	while(1)
+		readNextPosition()
+		serial.send()
+		while not serial.receive()
+			serial.send() 5 times
+		serial.read()
+		if wait for too long
+			raise error to client
+		if finish
+			if not des
+				update position to client
+			if des
+				update status to client and disconnet, break
