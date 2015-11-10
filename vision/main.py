@@ -2,6 +2,8 @@ from readTag import TagInfo
 import socket
 import time
 import serial
+import sys
+import errno
 
 
 # Upon powering up, run main.py
@@ -51,7 +53,10 @@ while 1:
         ACK = ser.read() # TODO: Check if command is lost or incorrect
         # Receive the signal from MCU when reaching target
         signal = ser.read()
+        # If MCU says if finishes
+        # TODO: check if too long time without a signal
         if signal == 'f':
+            # Sample a Tag to see if really finishes
             Tag.Capture()
             if Tag.TagDetected():
                 print "Distance: "+ str(Tag.Distance)
@@ -78,10 +83,32 @@ while 1:
             if target!=currentLoc:
                 # Try again 5 times
                 print "I am lost. I am now at "+str(currentLoc)
+            # Reaches target. Send position update to client
             conn.send(currentLoc)
-        if target == position:
-            conn.close()
-            break
+            # Receive ACK from client
+            conn.settimeout(0.0)
+            error_tolerance = 0
+            for x in xrange(5):
+                try:
+                    time.sleep(0.2)
+                    signal = conn.recv(1024)
+                except socket.error, e:
+                    err = e.args[0]
+                    if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
+                        print 'try again'
+                        error_tolerance = error_tolerance + 1
+                    else:
+                        print e
+                        sys.exit(1)
+                else: 
+                    if signal == 'y':
+                        break
+            # Drop connection when reaches destination
+            # or does not receive connection from client
+            if error_tolerance == 5 or currentLoc == destination:
+                print "Connection is dropped."
+                conn.close()
+                break
 
 #       if wait for too long
 #           raise error to client
