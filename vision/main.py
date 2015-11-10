@@ -40,7 +40,7 @@ while 1:
         print "Distance: "+ str(Tag.Distance)
         print "Orientation: "+ str(Tag.Orientation)
         print "Value: "+ str(Tag.Value)
-        currentLoc = Tag.Value
+        currentLoc = decodeLoc(Tag.Value)
     else:
         print "No tag detected."
         currentLoc = 0
@@ -62,7 +62,7 @@ while 1:
                 print "Distance: "+ str(Tag.Distance)
                 print "Orientation: "+ str(Tag.Orientation)
                 print "Value: "+ str(Tag.Value)
-                currentLoc = Tag.Value
+                currentLoc = decodeLoc(Tag.Value)
             else:
                 print "No tag detected."
                 currentLoc = 0
@@ -126,7 +126,8 @@ def readNextPosition(currentLoc, destination):
     ########################################################
     command = input('What is the command: [F, L, R, S]\n')
     offset = input('What is the offset: \n')
-    target = input('What is the next target: \n')
+    # target = input('What is the next target: \n')
+    target = 0
     return str(command)+str(offset), str(target)
 
 
