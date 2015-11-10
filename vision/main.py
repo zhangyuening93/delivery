@@ -24,40 +24,61 @@ print "Uart established."
 # Initialize camera
 Tag = TagInfo()
 
-# 3. while(1)
 while 1:
-#   listen(1)
+    # Listen for requests
     s.listen(1)
+    # Connect to a client
     conn, addr = s.accept()    
     print('Connected to', addr)
-    target = conn.recv(1024)
-#   while(1)
+    # Receive the destination location from the client.
+    destination = conn.recv(1024)
+    # Get the start location.
+    Tag.Capture()
+    if Tag.TagDetected:
+        print "Distance: "+ str(Tag.Distance)
+        print "Orientation: "+ str(Tag.Orientation)
+        print "Value: "+ str(Tag.Value)
+        currentLoc = Tag.Value
+    else:
+        print "No tag detected."
+        currentLoc = 0
+    # Start the main loop
     while 1:
-#       readNextPosition()
-        command, position = readNextPosition(target)
-#       serial.send()
+        # Read the next target
+        command, target = readNextPosition(currentLoc, destination)
+        # Send the command to MCU
         ser.write(command)
-#       while not serial.receive()
-        data = ser.read()
-#           serial.send() 5 times
-#       serial.read()
-        data = ser.read()
-        if data == 'f':
-            error_tolerance = 0
-            for x in xrange(5):
-                Tag.capture()
-                if Tag.TagDetected:
-                    print "Distance: "+ str(Tag.Distance)
-                    print "Orientation: "+ str(Tag.Orientation)
-                    print "Value: "+ str(Tag.Value)
-                    break
-                else:
-                    error_tolerance = error_tolerance + 1
-                time.sleep(0.5)
-            if error_tolerance == 5:
-                print "Tag is not recognized. Please check where I am :("
-
-            conn.send(position)
+        ACK = ser.read() # TODO: Check if command is lost or incorrect
+        # Receive the signal from MCU when reaching target
+        signal = ser.read()
+        if signal == 'f':
+            Tag.Capture()
+            if Tag.TagDetected():
+                print "Distance: "+ str(Tag.Distance)
+                print "Orientation: "+ str(Tag.Orientation)
+                print "Value: "+ str(Tag.Value)
+                currentLoc = Tag.Value
+            else:
+                print "No tag detected."
+                currentLoc = 0
+            # TODO: Need to make corrections
+            # error_tolerance = 0
+            # for x in xrange(5):
+            #     Tag.capture()
+            #     if Tag.TagDetected:
+            #         print "Distance: "+ str(Tag.Distance)
+            #         print "Orientation: "+ str(Tag.Orientation)
+            #         print "Value: "+ str(Tag.Value)
+            #         break
+            #     else:
+            #         error_tolerance = error_tolerance + 1
+            #     time.sleep(0.5)
+            # if error_tolerance == 5:
+            #     print "Tag is not recognized. Please check where I am :("
+            if target!=currentLoc:
+                # Try again 5 times
+                print "I am lost. I am now at "+str(currentLoc)
+            conn.send(currentLoc)
         if target == position:
             conn.close()
             break
@@ -70,3 +91,22 @@ while 1:
 #           if des
 #               update status to client and disconnet, break
 
+
+def readNextPosition(currentLoc, destination):
+    ########################################################
+    # Given the current location and the target, 
+    # return the next command and the next location
+    ########################################################
+    command = input('What is the command: [F, L, R, S]\n')
+    offset = input('What is the offset: \n')
+    target = input('What is the next target: \n')
+    return str(command)+str(offset), str(target)
+
+
+
+
+def decodeLoc(value):
+    ########################################################
+    # Decode the location from the AprilTag value
+    ########################################################
+    return value

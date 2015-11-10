@@ -22,7 +22,7 @@ while 1:
         error_tolerance = 0
         for x in xrange(5):
             try:
-                data = conn.recv(1024)
+                signal = conn.recv(1024)
             except socket.error, e:
                 err = e.args[0]
                 if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
@@ -36,12 +36,12 @@ while 1:
                     print e
                     sys.exit(1)
             else: 
-                if data == 'y':
+                if signal == 'y':
                     break
-                elif data == 'f':
-                    error_tolerance = 5
-                    break
-        if error_tolerance == 5:
+                # elif signal == 'f':
+                #     error_tolerance = 5
+                #     break
+        if error_tolerance == 5 or data == '10':
             print "Connection is dropped."
             conn.close()
             break

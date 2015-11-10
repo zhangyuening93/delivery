@@ -121,8 +121,8 @@ class AppTask(object):
             print "Send request!"
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.s.connect((self.HOST, self.PORT))
-            self.s.send(b'I need the robot!')
-            self.Target = '10'
+            self.s.send(b'Client: destination')
+            # self.Target = '10'
             self.root.after(500, self.getUpdate)
         else:
             self.root.after(1000, self.task)  # reschedule event in 2 seconds
@@ -144,9 +144,10 @@ class AppTask(object):
                 print e
                 sys.exit(1)
         else:
-            if data == self.Target:
+            if data == "":
+            # if data == self.Target:
                 print "Finish."
-                self.s.send(b'f')
+                # self.s.send(b'f')
                 self.s.shutdown(socket.SHUT_RDWR)
                 self.s.close()
                 self.app.resetRequest()
