@@ -16,15 +16,18 @@ def readNextPosition(currentLoc, destination):
     target = 0
     return command+offset, str(target)
 
-
-
-
-def decodeLoc(value):
+def decodeLoc(value, mask):
     ########################################################
     # Decode the location from the AprilTag value
     ########################################################
+    value = (~value + (value << 21)) & mask
+    value = value ^ value >> 24
+    value = ((value + (value << 3)) + (value << 8)) & mask
+    value = value ^ value >> 14
+    value = ((value + (value << 2)) + (value << 4)) & mask
+    value = value ^ value >> 28
+    value = (value + (value << 31)) & mask
     return value
-
 
 # Upon powering up, run main.py
 print "Program starts."
@@ -62,7 +65,7 @@ while 1:
         print "Distance: "+ str(Tag.Distance)
         print "Orientation: "+ str(Tag.Orientation)
         print "Value: "+ str(Tag.Value)
-        currentLoc = decodeLoc(Tag.Value)
+        currentLoc = decodeLoc(Tag.Value, (1<<8)-1)
     else:
         print "No tag detected."
         currentLoc = 0
@@ -70,7 +73,7 @@ while 1:
     while 1:
         # Read the next target
         command, target = readNextPosition(currentLoc, destination)
-	print command
+        print command
         # Send the command to MCU
         ser.write(command)
         ACK = ser.read() # TODO: Check if command is lost or incorrect
@@ -85,7 +88,7 @@ while 1:
                 print "Distance: "+ str(Tag.Distance)
                 print "Orientation: "+ str(Tag.Orientation)
                 print "Value: "+ str(Tag.Value)
-                currentLoc = decodeLoc(Tag.Value)
+                currentLoc = decodeLoc(Tag.Value, (1<<8)-1)
             else:
                 print "No tag detected."
                 currentLoc = 0

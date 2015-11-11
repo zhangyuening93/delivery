@@ -4,8 +4,8 @@ import errno
 import time
 import sys
 
-#HOST = socket.gethostname()                 # Symbolic name meaning all available interfaces
-HOST = '192.168.23.2'
+HOST = socket.gethostname()                 # Symbolic name meaning all available interfaces
+# HOST = '192.168.23.2'
 PORT = 50007              # Arbitrary non-privileged port
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))

@@ -22,6 +22,7 @@ class AppGUI(Frame):
 
         # Variables
         self._request_flag = 0
+        self._destination = ""
 
         self.grid()
         self._create_widgets()
@@ -31,6 +32,9 @@ class AppGUI(Frame):
 
     def resetRequest(self):
         self._request_flag = 0
+
+    def getDestination(self):
+        return self._destination
         
     def _create_widgets(self):
         self.canvas = Canvas(self, height=500, width=500, bg="white")
@@ -39,8 +43,11 @@ class AppGUI(Frame):
 
         mycolor = '#40E0D0'
 
-        self.button1 = Button(self, text="", command=self.cb_request, bg=mycolor)
+        self.button1 = Button(self, text="request", command=self.cb_request, bg=mycolor)
         self.button1.grid(row=2, column=1)
+
+        self.entry = Entry(self)
+        self.entry.grid(row=2, column=2)
 
         self.info = Text(self, height=33, width=50, wrap=WORD)
         self.info.grid(row=1, column=4)
@@ -63,38 +70,13 @@ class AppGUI(Frame):
         else:
             self.info.insert(0.0,"Send new request.\n")
             self._request_flag = 1
-        # self.button1.configure(bg="red")
-        # self.pub.publish(self.req_1_status, self.req_2_status, self.req_3_status)
-        
-    # def display_message(self, message):
-    #     self.info.insert(0.0, message)
-
-    # def update_button(self, req_1, req_2, req_3):
-    #     # print "will update button now."
-    #     mycolor = '#40E0D0'
-    #     if req_1:
-    #         self.button1.configure(bg=mycolor)
-    #         self.req_1_status = 0
-    #     if req_2:
-    #         self.button2.configure(bg=mycolor)
-    #         self.req_2_status = 0
-    #     if req_3:
-    #         self.button3.configure(bg=mycolor)
-    #         self.req_3_status = 0
-    #     # print "button should be updated now."
-    #     self.pub.publish(self.req_1_status, self.req_2_status, self.req_3_status)
+            self._destination = self.entry.get()
+            self.entry.delete(0, END)
 
 
+    def insertMsg(self, msg):
+        self.info.insert(0.0,msg)
 
-    # def callback_pub_1(self):
-    #     self.req_2_status = 1
-    #     self.button2.configure(bg="red")
-    #     self.pub.publish(self.req_1_status, self.req_2_status, self.req_3_status)
-
-    # def callback_pub_2(self):
-    #     self.req_3_status = 1
-    #     self.button3.configure(bg="red")
-    #     self.pub.publish(self.req_1_status, self.req_2_status, self.req_3_status)
 
             
 class AppTask(object):
@@ -121,7 +103,8 @@ class AppTask(object):
             print "Send request!"
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.s.connect((self.HOST, self.PORT))
-            self.s.send(b'Client: destination')
+            # self.s.send(b'Client: destination')
+            self.s.send(self.app.getDestination())
             # self.Target = '10'
             self.root.after(500, self.getUpdate)
         else:
@@ -136,7 +119,6 @@ class AppTask(object):
         except socket.error, e:
             err = e.args[0]
             if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
-                # time.sleep(1)
                 print 'No data available'
                 self.root.after(500, self.getUpdate)
             else:
@@ -145,14 +127,16 @@ class AppTask(object):
                 sys.exit(1)
         else:
             if data == "":
-            # if data == self.Target:
+                msg = "Request finished.\n"
+                self.app.insertMsg(msg)
                 print "Finish."
-                # self.s.send(b'f')
                 self.s.shutdown(socket.SHUT_RDWR)
                 self.s.close()
                 self.app.resetRequest()
                 self.root.after(1000, self.task)  # reschedule event in 2 seconds
             else:
+                msg = "Current position at: " + data + "\n"
+                self.app.insertMsg(msg)
                 print "Update Position."
                 self.s.send(b'y')
                 self.root.after(500, self.getUpdate)
