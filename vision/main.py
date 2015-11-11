@@ -5,6 +5,26 @@ import serial
 import sys
 import errno
 
+def readNextPosition(currentLoc, destination):
+    ########################################################
+    # Given the current location and the target, 
+    # return the next command and the next location
+    ########################################################
+    command = input('What is the command: [F, L, R, S]\n')
+    offset = input('What is the offset: \n')
+    # target = input('What is the next target: \n')
+    target = 0
+    return command+offset, str(target)
+
+
+
+
+def decodeLoc(value):
+    ########################################################
+    # Decode the location from the AprilTag value
+    ########################################################
+    return value
+
 
 # Upon powering up, run main.py
 print "Program starts."
@@ -12,7 +32,8 @@ print "Program starts."
 # 1. readMap("Map.txt")
 
 # 2. initialize socket, run server
-HOST = ''
+#HOST = ''
+HOST = '192.168.23.2'
 PORT = 50007
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
@@ -33,7 +54,8 @@ while 1:
     conn, addr = s.accept()    
     print('Connected to', addr)
     # Receive the destination location from the client.
-    destination = conn.recv(1024)
+    # destination = conn.recv(1024)
+    destination = 0
     # Get the start location.
     Tag.Capture()
     if Tag.TagDetected:
@@ -48,6 +70,7 @@ while 1:
     while 1:
         # Read the next target
         command, target = readNextPosition(currentLoc, destination)
+	print command
         # Send the command to MCU
         ser.write(command)
         ACK = ser.read() # TODO: Check if command is lost or incorrect
@@ -58,7 +81,7 @@ while 1:
         if signal == 'f':
             # Sample a Tag to see if really finishes
             Tag.Capture()
-            if Tag.TagDetected():
+            if Tag.TagDetected:
                 print "Distance: "+ str(Tag.Distance)
                 print "Orientation: "+ str(Tag.Orientation)
                 print "Value: "+ str(Tag.Value)
@@ -84,13 +107,13 @@ while 1:
                 # Try again 5 times
                 print "I am lost. I am now at "+str(currentLoc)
             # Reaches target. Send position update to client
-            conn.send(currentLoc)
+            conn.send(str(currentLoc))
             # Receive ACK from client
             conn.settimeout(0.0)
             error_tolerance = 0
             for x in xrange(5):
                 try:
-                    time.sleep(0.2)
+                    time.sleep(0.3)
                     signal = conn.recv(1024)
                 except socket.error, e:
                     err = e.args[0]
@@ -119,22 +142,4 @@ while 1:
 #               update status to client and disconnet, break
 
 
-def readNextPosition(currentLoc, destination):
-    ########################################################
-    # Given the current location and the target, 
-    # return the next command and the next location
-    ########################################################
-    command = input('What is the command: [F, L, R, S]\n')
-    offset = input('What is the offset: \n')
-    # target = input('What is the next target: \n')
-    target = 0
-    return str(command)+str(offset), str(target)
 
-
-
-
-def decodeLoc(value):
-    ########################################################
-    # Decode the location from the AprilTag value
-    ########################################################
-    return value
