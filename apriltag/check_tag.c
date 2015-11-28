@@ -9,10 +9,10 @@
 #include "apriltag.h"
 #include "image_u8.h"
 #include "tag36h11.h"
-#include "tag36h10.h"
-#include "tag36artoolkit.h"
-#include "tag25h9.h"
-#include "tag25h7.h"
+// #include "tag36h10.h"
+// #include "tag36artoolkit.h"
+// #include "tag25h9.h"
+// #include "tag25h7.h"
 
 #include "zarray.h"
 #include "getopt.h"
@@ -58,14 +58,14 @@ int CheckTag_system(float* c_1, float* c_2,float* angle, int argc, char *argv[])
         tf = tag36h11_create();
         // printf("I am in! yEs\n");        
     }
-    else if (!strcmp(famname, "tag36h10"))
-        tf = tag36h10_create();
-    else if (!strcmp(famname, "tag36artoolkit"))
-        tf = tag36artoolkit_create();
-    else if (!strcmp(famname, "tag25h9"))
-        tf = tag25h9_create();
-    else if (!strcmp(famname, "tag25h7"))
-        tf = tag25h7_create();
+    // else if (!strcmp(famname, "tag36h10"))
+    //     tf = tag36h10_create();
+    // else if (!strcmp(famname, "tag36artoolkit"))
+    //     tf = tag36artoolkit_create();
+    // else if (!strcmp(famname, "tag25h9"))
+    //     tf = tag25h9_create();
+    // else if (!strcmp(famname, "tag25h7"))
+    //     tf = tag25h7_create();
     else {
         printf("Unrecognized tag family name. Use e.g. \"tag36h11\".\n");
         exit(-1);

@@ -8,7 +8,7 @@ APRILTAG_OBJS = apriltag.o apriltag_quad_thresh.o tag16h5.o tag25h7.o tag25h9.o 
 
 LIBAPRILTAG := libapriltag.a
 
-all: $(LIBAPRILTAG) apriltag_demo readtag
+all: $(LIBAPRILTAG) apriltag_demo
 
 
 $(LIBAPRILTAG): $(APRILTAG_OBJS)
@@ -18,10 +18,6 @@ $(LIBAPRILTAG): $(APRILTAG_OBJS)
 apriltag_demo: apriltag_demo.o
 	@echo "   [$@]"
 	@$(CC) -o $@ apriltag_demo.o $(APRILTAG_OBJS) $(LDFLAGS)
-
-readtag: readtag.o
-	@echo "   [$@]"
-	@$(CC) -o $@ readtag.o $(APRILTAG_OBJS) $(LDFLAGS)
 
 %.o: %.c
 	@echo "   $@"
