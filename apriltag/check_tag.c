@@ -25,7 +25,7 @@
 
 static PyObject *TagError;
 
-int CheckTag_system(float* c_1, float* c_2,float* angle, int argc, char *argv[])
+int CheckTag_system(int* succeed, float* c_1, float* c_2,float* angle, int argc, char *argv[])
 {
     int retVal=0;
 
@@ -133,6 +133,7 @@ int CheckTag_system(float* c_1, float* c_2,float* angle, int argc, char *argv[])
                 }
 
                 hamm_hist[det->hamming]++;
+                *succeed = *succeed + 1;
             }
 
             apriltag_detections_destroy(detections);
@@ -166,12 +167,12 @@ int CheckTag_system(float* c_1, float* c_2,float* angle, int argc, char *argv[])
 }
 
 
-int CheckTag_helper(float* c_1, float* c_2,float* angle, const char *command){
+int CheckTag_helper(int* succeed, float* c_1, float* c_2,float* angle, const char *command){
     int argcVal = 2;
     int retVal = 0;
     char *argv[2] = {"hello", command};
     // printf("Yes\n");
-    retVal = CheckTag_system(c_1, c_2, angle, argcVal, argv);
+    retVal = CheckTag_system(succeed, c_1, c_2, angle, argcVal, argv);
     // printf("Yes\n");
     return retVal;
 }
@@ -181,19 +182,20 @@ static PyObject *
 tag_system(PyObject *self, PyObject *args)
 {
     const char *command;
-    int sts;
-    float c_1;
-    float c_2;
-    float angle;
+    int sts = 0;
+    int succeed = 0;
+    float c_1 = 0;
+    float c_2 = 0;
+    float angle = 0;
 
     if (!PyArg_ParseTuple(args, "s", &command))
         return NULL;
-    sts = CheckTag_helper(&c_1, &c_2, &angle, command);
+    sts = CheckTag_helper(&succeed, &c_1, &c_2, &angle, command);
     if (sts < 0) {
         PyErr_SetString(TagError, "System command failed");
         return NULL;
     }
-    return Py_BuildValue("[ifff]", sts, c_1, c_2, angle);
+    return Py_BuildValue("[iifff]", succeed, sts, c_1, c_2, angle);
 }
 
 static PyMethodDef TagMethods[] ={
