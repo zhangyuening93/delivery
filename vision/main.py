@@ -1,7 +1,7 @@
 from vision import *
 import socket
 import time
-import serial
+# import serial
 import sys
 import errno
 import exmod
@@ -105,9 +105,9 @@ s.bind((HOST, PORT))
 print "Server is on."
 
 # Initialize uart
-usbport = '/dev/ttyAMA0'
-ser = serial.Serial(usbport, 9600)
-print "Uart established."
+# usbport = '/dev/ttyAMA0'
+# ser = serial.Serial(usbport, 9600)
+# print "Uart established."
 
 # Initialize camera
 camera = TagCamera()
@@ -139,10 +139,12 @@ while 1:
         idx, command, target = readNextCommand(idx, path, currentLoc, currentAngle, currentDis)
         print "Next command is: "+command
         # Send the command to MCU
-        ser.write(command)
-        ACK = ser.read() # TODO: Check if command is lost or incorrect
+        # ser.write(command)
+        # ACK = ser.read() # TODO: Check if command is lost or incorrect
         # Receive the signal from MCU when reaching target
-        signal = ser.read()
+        # signal = ser.read()
+        time.sleep(5)
+        signal = 'f'
         # If MCU says if finishes
         # TODO: check if too long time without a signal
         if signal == 'f':
