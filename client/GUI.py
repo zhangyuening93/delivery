@@ -58,15 +58,15 @@ class AppGUI(Frame):
        
 
     def _configure_canvas(self):
-        self.car_shape = self.canvas.create_rectangle(int(500/NUMROW*self.pos_x-10), int(500/NUMCOL*self.pos_y-10), int(500/NUMROW*self.pos_x+10), int(500/NUMCOL*self.pos_y+10), fill="blue")
-        self.car_text = self.canvas.create_text(int(500/NUMROW*self.pos_x), int(500/NUMCOL*self.pos_y), text="R")
+        self.car_shape = self.canvas.create_rectangle(int(500/NUMCOL*self.pos_y-10), int(500/NUMROW*self.pos_x-10), int(500/NUMCOL*self.pos_y+10), int(500/NUMROW*self.pos_x+10), fill="blue")
+        self.car_text = self.canvas.create_text(int(500/NUMCOL*self.pos_y), int(500/NUMROW*self.pos_x), text="R")
 
 
     def updatePosition(self):
         self.canvas.delete(self.car_shape)
         self.canvas.delete(self.car_text)
-        self.car_shape = self.canvas.create_rectangle(int(500/NUMROW*self.pos_x-10), int(500/NUMCOL*self.pos_y-10), int(500/NUMROW*self.pos_x+10), int(500/NUMCOL*self.pos_y+10), fill="blue")
-        self.car_text = self.canvas.create_text(int(500/NUMROW*self.pos_x), int(500/NUMCOL*self.pos_y), text="R")
+        self.car_shape = self.canvas.create_rectangle(int(500/NUMCOL*self.pos_y-10), int(500/NUMROW*self.pos_x-10), int(500/NUMCOL*self.pos_y+10), int(500/NUMROW*self.pos_x+10), fill="blue")
+        self.car_text = self.canvas.create_text(int(500/NUMCOL*self.pos_y), int(500/NUMROW*self.pos_x), text="R")
 
     def cb_request(self):
         if self._request_flag == 1:
