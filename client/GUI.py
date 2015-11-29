@@ -5,20 +5,24 @@ import socket
 # import numpy as np
 import time
 import errno
+import math
 
-
+NUMCOL = 10
+NUMROW = 20
+INIT_X = 0
+INIT_Y = 0
 
 class AppGUI(Frame):
     """This is the GUI application for computer terminal."""
 
-    def __init__(self, master, pos_x=50, pos_y=50):
+    def __init__(self, master, pos_x=0, pos_y=0):
         # Initialize GUI
 
         Frame.__init__(self, master)
 
         # Initial configuration
-        self._pos_x = pos_x
-        self._pos_y = pos_y
+        self.pos_x = pos_x
+        self.pos_y = pos_y
 
         # Variables
         self._request_flag = 0
@@ -54,15 +58,15 @@ class AppGUI(Frame):
        
 
     def _configure_canvas(self):
-        self.shape = self.canvas.create_rectangle(self._pos_x-10, self._pos_y-10, self._pos_x+10, self._pos_y+10, fill="blue")
-        self.text = self.canvas.create_text(self._pos_x, self._pos_y, text="R")
+        self.shape = self.canvas.create_rectangle(500/NUMCOL*self.pos_x-10, 500/NUMROW*self.pos_y-10, 500/NUMCOL*self.pos_x+10, 500/NUMROW*self.pos_y+10, fill="blue")
+        self.text = self.canvas.create_text(500/NUMCOL*self.pos_x, 500/NUMROW*self.pos_y, text="R")
 
 
-    def updatePosition(self, pos_x, pos_y):
+    def updatePosition(self):
         self.canvas.delete(self.car_shape)
         self.canvas.delete(self.car_text)
-        self.car_shape = self.canvas.create_rectangle(pos_x-10, pos_y-10, pos_x+10, pos_y+10, fill="blue")
-        self.car_text = self.canvas.create_text(pos_x, pos_y, text="R")
+        self.car_shape = self.canvas.create_rectangle(500/NUMCOL*self.pos_x-10, 500/NUMROW*self.pos_y-10, 500/NUMCOL*self.pos_x+10, 500/NUMROW*self.pos_y+10, fill="blue")
+        self.car_text = self.canvas.create_text(500/NUMCOL*self.pos_x, 500/NUMROW*self.pos_y, text="R")
 
     def cb_request(self):
         if self._request_flag == 1:
@@ -86,7 +90,7 @@ class AppTask(object):
         self.root = Tk()
         self.root.title("Service")
         self.root.protocol("WM_DELETE_WINDOW", self.callback)
-        self.app = AppGUI(self.root)
+        self.app = AppGUI(self.root, INIT_X, INIT_Y)
 
         # Flags
         # self._connected = 0
@@ -133,11 +137,22 @@ class AppTask(object):
                 self.s.shutdown(socket.SHUT_RDWR)
                 self.s.close()
                 self.app.resetRequest()
-                self.root.after(1000, self.task)  # reschedule event in 2 seconds
-            else:
-                msg = "Current position at: " + data + "\n"
+                self.root.after(1000, self.task)
+            elif data == 'F':
+                msg = "I am lost. Please find me at ("+str(self.app.pos_x)+', '+str(self.app.pos_y)+").\n"
                 self.app.insertMsg(msg)
+                self.s.shutdown(socket.SHUT_RDWR)
+                self.s.close()
+                self.app.resetRequest()
+                self.root.after(1000, self.task)
+            else:
                 print "Update Position."
+                data = int(data)
+                self.app.pos_x = math.floor(data/NUMCOL)
+                self.app.pos_y = data%NUMCOL
+                self.app.updatePosition()
+                msg = "Current position at ("+str(self.app.pos_x)+', '+str(self.app.pos_y)+").\n"
+                self.app.insertMsg(msg)
                 self.s.send(b'y')
                 self.root.after(500, self.getUpdate)
 

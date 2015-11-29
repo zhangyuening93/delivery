@@ -1,46 +1,104 @@
-from readTag import TagInfo
+from vision import *
 import socket
 import time
 import serial
 import sys
 import errno
+import exmod
+import math
+
 
 # Define some parameters
 BITS = 6
 HOST = '192.168.23.2'
+NUMCOL = 10
+E_ANGLE = 180
+N_ANGLE = 270
+W_ANGLE = 0
+S_ANGLE = 90
 
-def readNextCommand(currentLoc, currentAngle, currentDis, destination):
-    ########################################################
-    # Given the current location and the target, 
+
+def getDirection(value):
+    # return direction
+    # if 1, then direction is correct, otherwise, correct direction
+    # original value is -180~180
+    value = value + 180
+    if abs(value-E_ANGLE)<10:
+        return 1, 'e'
+    elif abs(value-N_ANGLE)<10:
+        return 1, 'n'
+    elif abs(value-S_ANGLE)<10:
+        return 1, 's'
+    elif abs(value-W_ANGLE)<10 or abs(value-W_ANGLE)>350:
+        return 1, 'w'
+    else:
+        return 0, 'b'
+
+def updateLoc(currentLoc, currDir, offset):
+    newLoc = currentLoc
+    if currDir == 's':
+        newLoc[0] = newLoc[0] + offset
+    elif currDir == 'e':
+        newLoc[1] = newLoc[1] + offset
+    elif currDir == 'w':
+        newLoc[1] = newLoc[1] - offset
+    elif currDir == 'n':
+        newLoc[0] = newLoc[0] - offset
+    return newLoc
+
+def getLRCommand(currDir, goalDir):
+    if currDir == 's' and goalDir == 'e':
+        return 'L'
+    elif currDir == 's' and goalDir == 'w':
+        return 'R'
+    elif currDir == 'n' and goalDir == 'w':
+        return 'L'
+    elif currDir == 'n' and goalDir == 'e':
+        return 'R'
+    elif currDir == 'w' and goalDir == 's':
+        return 'L'
+    elif currDir == 'w' and goalDir == 'n':
+        return 'R'
+    elif currDir == 'e' and goalDir == 'n':
+        return 'L'
+    elif currDir == 'e' and goalDir == 's':
+        return 'R'
+    else:
+        print "error[1]"
+        sys.exit(1)
+
+
+def readNextCommand(idx, path, currentLoc, currentAngle, currentDis):
     # return the next command and the next location
-    # When the command the turning, target should be same,
-    # otherwise, target is the next position.
-    # 
-    ########################################################
-    command = input('What is the command: [F, L, R, S]\n')
-    offset = input('What is the offset: \n')
-    target = input('What is the next target: \n')
-    return command+offset, target
+    # At first, idx = 0
+    suc, currDir = getDirection(currentAngle)
+    # TODO: Need to check distance.
+    if suc:
+        if path[idx] == currDir:
+            # case: Forward
+            offset = 1
+            while 1:
+                idx = idx + 1
+                if path[idx]==currDir:
+                    offset = offset + 1
+                else:
+                    newLoc = updateLoc(currentLoc, currDir, offset)
+                    break
+            return idx, 'F'+str(offset), newLoc
+        else:
+            # case: turning
+            command = getLRCommand(currDir, path[idx])
+            return idx, command+'90', currentLoc
+    else:
+        # TODO: Need commands for minor adjustments
+        print "error[2]"
+        sys.exit(1)
 
-def decodeLoc(value, mask):
-    ########################################################
-    # Decode the location from the AprilTag value
-    ########################################################
-    value = (~value + (value << 21)) & mask
-    value = value ^ value >> 24
-    value = ((value + (value << 3)) + (value << 8)) & mask
-    value = value ^ value >> 14
-    value = ((value + (value << 2)) + (value << 4)) & mask
-    value = value ^ value >> 28
-    value = (value + (value << 31)) & mask
-    return value
 
 # Upon powering up, run main.py
 print "Program starts."
 
-# 1. readMap("Map.txt")
-
-# 2. initialize socket, run server
+# initialize socket, run server
 PORT = 50007
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
@@ -52,7 +110,8 @@ ser = serial.Serial(usbport, 9600)
 print "Uart established."
 
 # Initialize camera
-Tag = TagInfo()
+camera = TagCamera()
+print "camera is on."
 
 while 1:
     # Listen for requests
@@ -61,44 +120,23 @@ while 1:
     conn, addr = s.accept()    
     print('Connected to', addr)
     # Receive the destination location from the client.
-    destination = int(conn.recv(1024))
+    destination = decodeLoc(int(conn.recv(1024)))
     print "Receive destination: "+str(destination)
     # Get the start location and orientation
-    error_tolerance = 0
-    while 1:
-        Tag.Capture()
-        if Tag.TagDetected:
-            currentLoc = decodeLoc(Tag.Value, (1<<BITS)-1)
-            currentAngle = Tag.Orientation
-            currentDis = Tag.Distance
-            print "Location is: "+str(currentLoc)
-            print "Distance is: "+str(Tag.Distance)
-            print "Orientation is: "+str(currentAngle)
-            break
-        else:
-            print "No tag detected."
-            error_tolerance = error_tolerance + 1
-            if error_tolerance == 5:
-                getInput = raw_input("Which loc do you want to set? Press enter to continue.\n")
-                if getInput == "":
-                    error_tolerance = 0
-                    time.sleep(0.2)
-                else:
-                    currentLoc = getInput
-                    getInput = input("Which distance do you want to set?\n")
-                    currentDis= getInput
-                    getInput = input("Which orientation do you want to set?\n")
-                    currentAngle = getInput
-                    print "Location is: "+str(currentLoc)
-                    print "Distance is: "+str(Tag.Distance)
-                    print "Orientation is: "+str(currentAngle)
-                    break
-            else:
-                time.sleep(0.2)
+    detected, currentLoc, currentAngle, currentDis = camera.getTagInfo()
+    if not detected:
+        print "I am lost at initial position."
+        conn.send('F')
+        print "Connection is dropped."
+        conn.close()
+        continue
+    # Get the path
+    path = exmod.find_route(currentLoc[0], currentLoc[1], destination[0],destination[1])
+    idx = 0
     # Start the main loop
     while 1:
         # Read the next target
-        command, target = readNextCommand(currentLoc, currentAngle, currentDis, destination)
+        idx, command, target = readNextCommand(idx, path, currentLoc, currentAngle, currentDis)
         print "Next command is: "+command
         # Send the command to MCU
         ser.write(command)
@@ -109,47 +147,23 @@ while 1:
         # TODO: check if too long time without a signal
         if signal == 'f':
             # Sample a Tag to see if really finishes
-            error_tolerance = 0
-            while 1:
-                Tag.Capture()
-                if Tag.TagDetected:
-                    currentLoc = decodeLoc(Tag.Value, (1<<BITS)-1)
-                    currentAngle = Tag.Orientation
-                    currentDis = Tag.Distance
-                    print "Location is: "+str(currentLoc)
-                    print "Distance is: "+str(Tag.Distance)
-                    print "Orientation is: "+str(currentAngle)
-                if Tag.TagDetected==0 or target!=currentLoc:
-                    if Tag.TagDetected==0:
-                        print "No tag detected."
-                    else:
-                        print "Location does not match: "+str(target)+". Resample image."
-                    error_tolerance = error_tolerance + 1
-                    if error_tolerance == 5:
-                        getInput = raw_input("Which loc do you want to set? Press enter to continue.\n")
-                        if getInput == "":
-                            error_tolerance = 0
-                            time.sleep(0.2)
-                        else:
-                            # print "I am lost:(.. I am now at "+str(currentLoc)
-                            # sys.exit(1)
-                            currentLoc = getInput
-                            getInput = input("Which distance do you want to set?\n")
-                            currentDis= getInput
-                            getInput = input("Which orientation do you want to set?\n")
-                            currentAngle = getInput
-                            print "Location is: "+str(currentLoc)
-                            print "Distance is: "+str(Tag.Distance)
-                            print "Orientation is: "+str(currentAngle)
-                            break
-                    else:
-                        time.sleep(0.2)
+            detected, currentLoc, currentAngle, currentDis = camera.getTagInfo()
             # Delete after
+            if not detected:
+                print "I am lost:(.."
+                conn.send('F')
+                print "Connection is dropped."
+                conn.close()
+                break
             if target!=currentLoc:
                 print "I am lost:(.. I am now at "+str(currentLoc)
-                sys.exit(1)
+                conn.send('F')
+                print "Connection is dropped."
+                conn.close()
+                break
             # Reaches target. Send position update to client
-            conn.send(str(currentLoc))
+            sendLoc = currentLoc[0]*NUMCOL + currentLoc[1]
+            conn.send(str(sendLoc))
             # Receive ACK from client
             conn.settimeout(0.0)
             error_tolerance = 0
