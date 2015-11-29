@@ -1,17 +1,15 @@
-from vision import *
+from vision_2 import *
 import socket
 import time
-import serial
+# import serial
 import sys
 import errno
 import exmod
-import math
 
 
 # Define some parameters
 BITS = 6
-HOST = '192.168.23.2'
-NUMCOL = 10
+HOST = socket.gethostname()
 E_ANGLE = 180
 N_ANGLE = 270
 W_ANGLE = 0
@@ -35,37 +33,39 @@ def getDirection(value):
         return 0, 'b'
 
 def updateLoc(currentLoc, currDir, offset):
-    newLoc = currentLoc
     if currDir == 's':
-        newLoc[0] = newLoc[0] + offset
+        newLoc = (currentLoc[0] + offset, currentLoc[1])
     elif currDir == 'e':
-        newLoc[1] = newLoc[1] + offset
+        newLoc = (currentLoc[0], currentLoc[1] + offset)
     elif currDir == 'w':
-        newLoc[1] = newLoc[1] - offset
+        newLoc = (currentLoc[0], currentLoc[1] - offset)
     elif currDir == 'n':
-        newLoc[0] = newLoc[0] - offset
+        newLoc = (currentLoc[0] - offset, currentLoc[1])
     return newLoc
 
 def getLRCommand(currDir, goalDir):
-    if currDir == 's' and goalDir == 'e':
-        return 'L'
-    elif currDir == 's' and goalDir == 'w':
-        return 'R'
-    elif currDir == 'n' and goalDir == 'w':
-        return 'L'
-    elif currDir == 'n' and goalDir == 'e':
-        return 'R'
-    elif currDir == 'w' and goalDir == 's':
-        return 'L'
-    elif currDir == 'w' and goalDir == 'n':
-        return 'R'
-    elif currDir == 'e' and goalDir == 'n':
-        return 'L'
-    elif currDir == 'e' and goalDir == 's':
-        return 'R'
-    else:
-        print "error[1]"
-        sys.exit(1)
+    if currDir == 's':
+        if goalDir == 'e':
+            return 'L'
+        else:
+            return 'R'
+    if currDir == 'n':
+        if goalDir == 'w':
+            return 'L'
+        else:
+            return 'R'
+    if currDir == 'w':
+        if goalDir == 's':
+            return 'L'
+        else:
+            return 'R'
+    if currDir == 'e':
+        if goalDir == 'n':
+            return 'L'
+        else:
+            return 'R'   
+    print "error[1]"
+    sys.exit(1)
 
 
 def readNextCommand(idx, path, currentLoc, currentAngle, currentDis):
@@ -75,17 +75,23 @@ def readNextCommand(idx, path, currentLoc, currentAngle, currentDis):
     # TODO: Need to check distance.
     if suc:
         if path[idx] == currDir:
+            print "current direction is: "+currDir+". Direction matches."
             # case: Forward
             offset = 1
             while 1:
                 idx = idx + 1
-                if path[idx]==currDir:
-                    offset = offset + 1
+                if idx < len(path):
+                    if path[idx]==currDir:
+                        offset = offset + 1
+                    else:
+                        newLoc = updateLoc(currentLoc, currDir, offset)
+                        break
                 else:
                     newLoc = updateLoc(currentLoc, currDir, offset)
                     break
             return idx, 'F'+str(offset), newLoc
         else:
+            print "current direction is: "+currDir+". Direction does not match."
             # case: turning
             command = getLRCommand(currDir, path[idx])
             return idx, command+'90', currentLoc
@@ -105,9 +111,9 @@ s.bind((HOST, PORT))
 print "Server is on."
 
 # Initialize uart
-usbport = '/dev/ttyAMA0'
-ser = serial.Serial(usbport, 9600)
-print "Uart established."
+# usbport = '/dev/ttyAMA0'
+# ser = serial.Serial(usbport, 9600)
+# print "Uart established."
 
 # Initialize camera
 camera = TagCamera()
@@ -131,18 +137,29 @@ while 1:
         conn.close()
         continue
     # Get the path
+    # print currentLoc
+    # print destination
+    # print currentLoc[0]
+    # print currentLoc[1]
+    # print destination[0]
+    # print destination[1]
+
     path = exmod.find_route(currentLoc[0], currentLoc[1], destination[0],destination[1])
+    print path
     idx = 0
     # Start the main loop
     while 1:
         # Read the next target
         idx, command, target = readNextCommand(idx, path, currentLoc, currentAngle, currentDis)
         print "Next command is: "+command
+        print "targetLoc is: "+str(target)
         # Send the command to MCU
-        ser.write(command)
-        ACK = ser.read() # TODO: Check if command is lost or incorrect
+        # ser.write(command)
+        # ACK = ser.read() # TODO: Check if command is lost or incorrect
         # Receive the signal from MCU when reaching target
-        signal = ser.read()
+        # signal = ser.read()
+        time.sleep(5)
+        signal = 'f'
         # If MCU says if finishes
         # TODO: check if too long time without a signal
         if signal == 'f':

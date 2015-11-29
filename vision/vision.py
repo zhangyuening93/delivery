@@ -2,13 +2,17 @@ from tagInfo import *
 from PIL import Image
 from picamera import Picamera
 import time
+import math
+
 
 # Define
 DEBUG = 1
+NUMCOL = 10
+
 
 def decodeLoc(value):
     # return (row, col)
-    return math.floor(value/NUMCOL), value%NUMCOL
+    return (int(math.floor(value/NUMCOL)), int(value%NUMCOL))
 
 class TagCamera(object):
 	def __init__(self):
@@ -27,7 +31,7 @@ class TagCamera(object):
 		angle = val[4]
 		return succeed, ID, angle, (width, height)
 
-	def getTagInfo():
+	def getTagInfo(self):
 	    # if fail to catch a tag, try 5 times
 	    error_tolerance = 0
 	    while 1:
@@ -37,7 +41,7 @@ class TagCamera(object):
 	            currentDis[0] = currentDis[0] - 320
 	            currentDis[1] = currentDis[1] - 240
 	            print "Location is: "+str(currentLoc)
-	            print "Distance is: "+str(Tag.Distance)
+	            print "Distance is: "+str(currentDis)
 	            print "Orientation is: "+str(currentAngle)
 	            break
 	        else:
@@ -46,20 +50,20 @@ class TagCamera(object):
 	            if error_tolerance == 5:
 	                # TODO: delete DEBUG
 	                if DEBUG:
-	                    getInput = raw_input("Which loc do you want to set? Press enter to continue.\n")
+	                    getInput = raw_input("Do you want to keep trying? y/enter\n")
 	                    if getInput == "":
 	                        error_tolerance = 0
 	                        time.sleep(0.2)
-	                    else:
-	                        currentLoc = getInput
-	                        getInput = input("Which distance do you want to set?\n")
-	                        currentDis= getInput
-	                        getInput = input("Which orientation do you want to set?\n")
-	                        currentAngle = getInput
-	                        print "Location is: "+str(currentLoc)
-	                        print "Distance is: "+str(Tag.Distance)
-	                        print "Orientation is: "+str(currentAngle)
+	                    elif getInput == 'y':
+	                        currentLoc = input("Which loc do you want to set?\n")
+					        currentDis = input("Which distance do you want to set?\n")
+					        currentAngle = input("Which orientation do you want to set?\n")
+					        print "Location is: "+str(currentLoc)
+					        print "Distance is: "+str(currentDis)
+					        print "Orientation is: "+str(currentAngle)
 	                        break
+	                    else:
+	                 	   return detected, 0, 0, (0, 0)
 	                else:
 	                    return detected, 0, 0, (0, 0)
 	            else:
