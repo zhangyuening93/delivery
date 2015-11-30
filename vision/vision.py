@@ -1,6 +1,6 @@
 from tagInfo import *
 from PIL import Image
-from picamera import Picamera
+from picamera import PiCamera
 import time
 import math
 
@@ -16,7 +16,7 @@ def decodeLoc(value):
 
 class TagCamera(object):
 	def __init__(self):
-		self._camera = Picamera()
+		self._camera = PiCamera()
 		self._camera.resolution = (640, 480)
 
 	def CaptureTag(self):
@@ -38,8 +38,7 @@ class TagCamera(object):
 	        detected, currentLoc, currentAngle, currentDis = self.CaptureTag()
 	        if detected:
 	            currentLoc = decodeLoc(currentLoc)
-	            currentDis[0] = currentDis[0] - 320
-	            currentDis[1] = currentDis[1] - 240
+	            currentDis = (currentDis[0] - 320,currentDis[1] - 240)
 	            print "Location is: "+str(currentLoc)
 	            print "Distance is: "+str(currentDis)
 	            print "Orientation is: "+str(currentAngle)
@@ -56,14 +55,15 @@ class TagCamera(object):
 	                        time.sleep(0.2)
 	                    elif getInput == 'y':
 	                        currentLoc = input("Which loc do you want to set?\n")
-					        currentDis = input("Which distance do you want to set?\n")
-					        currentAngle = input("Which orientation do you want to set?\n")
-					        print "Location is: "+str(currentLoc)
-					        print "Distance is: "+str(currentDis)
-					        print "Orientation is: "+str(currentAngle)
+				currentDis = input("Which distance do you want to set?\n")
+				currentAngle = input("Which orientation do you want to set?\n")
+				detected = 1
+				print "Location is: "+str(currentLoc)
+				print "Distance is: "+str(currentDis)
+				print "Orientation is: "+str(currentAngle)
 	                        break
 	                    else:
-	                 	   return detected, 0, 0, (0, 0)
+	                 	return detected, 0, 0, (0, 0)
 	                else:
 	                    return detected, 0, 0, (0, 0)
 	            else:
