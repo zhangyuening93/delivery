@@ -30,11 +30,20 @@ args = vars(ap.parse_args())
 with PiCamera() as camera:
 	camera.resolution = (640, 480)
 	while 1:
+		mytime = time.time()
 		camera.capture('mysample.jpg')
+		mytime = time.time() - mytime
+		print mytime
+		mytime = time.time()
 		im = Image.open("mysample.jpg")
 		im.save("mysample.ppm")
+		mytime = time.time() - mytime
+		print mytime
+		mytime = time.time()
 		val = tagInfo('mysample.ppm')
 		print val
+		mytime = time.time() - mytime
+		print mytime
 
 
 

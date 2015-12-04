@@ -1,11 +1,13 @@
-from vision import *
+]from vision import *
 import socket
 import time
 # import serial
 import errno
 import exmod
 import sys
+import RPi.GPIO as GPIO
 
+PIN  = 12
 # Define some parameters
 HOST = socket.gethostname()
 
@@ -19,13 +21,17 @@ s.bind((HOST, PORT))
 print "Server is on."
 
 # Initialize uart
-# usbport = '/dev/ttyAMA0'
-# ser = serial.Serial(usbport, 9600)
-# print "Uart established."
+usbport = '/dev/ttyAMA0'
+ser = serial.Serial(usbport, 9600)
+print "Uart established."
 
 # Initialize camera
 camera = TagCamera()
 print "camera is on."
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(PIN, GPIO.OUT)
+GPIO.output(PIN, GPIO.LOW)
+print "GPIO" + str(PIN) + "set up to output." 
 
 while 1:
     # Listen for requests
@@ -55,11 +61,19 @@ while 1:
             print "Next command is: "+command
             # Send the command to MCU
             # Set GPIO
-            # ser.write(command)
-            # signal = ser.read()
+            
+            GPIO.output(PIN, GPIO.LOW)
+            GPIO.output(PIN, GPIO.HIGH)
+            while 1:
+                ser.write(command)
+                signal = ser.read()
+                if signal == command:
+                   GPIO.output(PIN, GPIO.LOW)
+                   break
+   
             if command=='L' or command == 'R':
-                time.sleep(5)
-            # signal = 'f'
+                time.sleep(20)
+        #signal = 'f'
         # If MCU says if finishes
         # TODO: check if too long time without a signal
         # if signal == 'f':
