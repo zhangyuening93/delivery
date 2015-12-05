@@ -1,7 +1,7 @@
-]from vision import *
+#from vision import *
 import socket
 import time
-# import serial
+import serial
 import errno
 import exmod
 import sys
@@ -10,13 +10,13 @@ import RPi.GPIO as GPIO
 MyCommand = "ABSLR"
 idx = 0
 
-def NextCommand():
+def NextCommand(idx):
     if idx < 5:
         result = MyCommand[idx]
         idx = idx+1
     return result
 
-PIN  = 12
+PIN  = 24
 # Define some parameters
 HOST = socket.gethostname()
 
@@ -25,10 +25,10 @@ HOST = socket.gethostname()
 print "Program starts."
 
 # initialize socket, run server
-PORT = 50007
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((HOST, PORT))
-print "Server is on."
+#PORT = 50007
+#s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#s.bind((HOST, PORT))
+#print "Server is on."
 
 # Initialize uart
 usbport = '/dev/ttyAMA0'
@@ -36,12 +36,12 @@ ser = serial.Serial(usbport, 9600)
 print "Uart established."
 
 # Initialize camera
-camera = TagCamera()
-print "camera is on."
-GPIO.setmode(GPIO.BOARD)
+#camera = TagCamera()
+#print "camera is on."
+GPIO.setmode(GPIO.BCM)
 GPIO.setup(PIN, GPIO.OUT)
 GPIO.output(PIN, GPIO.LOW)
-print "GPIO" + str(PIN) + "set up to output." 
+print "GPIO" + str(PIN) + " set up to output." 
 
 while 1:
     # Listen for requests
@@ -67,7 +67,7 @@ while 1:
             # path = exmod.find_route(currentLoc[0], currentLoc[1], destination[0],destination[1])
             # print path
             # Read the next target
-        command= NextCommand()
+        command= NextCommand(idx)
         print "Next command is: "+command
         # Send the command to MCU
         # Set GPIO

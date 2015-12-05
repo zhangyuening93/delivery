@@ -1,5 +1,6 @@
-# from PIL import Image
-# from picamera import PiCamera
+from PIL import Image
+from picamera import PiCamera
+from tagInfo import *
 import time
 import math
 import sys
@@ -8,13 +9,13 @@ import sys
 
 # Define
 # DEBUG = 1
-NUMCOL = 10
+NUMCOL = 5
 CENTER_X = 320
 CENTER_Y = 240
-E_ANGLE = 180
-N_ANGLE = 270
-W_ANGLE = 0
-S_ANGLE = 90
+E_ANGLE = 270
+N_ANGLE = 180
+W_ANGLE = 90
+S_ANGLE = 0
 
 
 def getDirection(value):
@@ -22,13 +23,13 @@ def getDirection(value):
     # if 1, then direction is correct, otherwise, correct direction
     # original value is -180~180
     value = value + 180
-    if abs(value-E_ANGLE)<10:
+    if abs(value-E_ANGLE)<20:
         return 1, 'e'
-    elif abs(value-N_ANGLE)<10:
+    elif abs(value-N_ANGLE)<20:
         return 1, 'n'
-    elif abs(value-S_ANGLE)<10:
+    elif abs(value-S_ANGLE)<20 or abs(value-S_ANGLE)>340:
         return 1, 's'
-    elif abs(value-W_ANGLE)<10 or abs(value-W_ANGLE)>350:
+    elif abs(value-W_ANGLE)<20:
         return 1, 'w'
     else:
         return 0, 'b'

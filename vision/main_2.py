@@ -1,15 +1,15 @@
-]from vision import *
+from vision import *
 import socket
 import time
-# import serial
+import serial
 import errno
 import exmod
 import sys
 import RPi.GPIO as GPIO
 
-PIN  = 12
+PIN  = 18
 # Define some parameters
-HOST = socket.gethostname()
+HOST = '35.2.109.158'
 
 # Upon powering up, run main.py
 print "Program starts."
@@ -62,17 +62,24 @@ while 1:
             # Send the command to MCU
             # Set GPIO
             
+            print "GPIO is low"
             GPIO.output(PIN, GPIO.LOW)
+            print "GPIO is high"
             GPIO.output(PIN, GPIO.HIGH)
             while 1:
                 ser.write(command)
+                print "command has been written."
                 signal = ser.read()
+                print "ACK received."
                 if signal == command:
                    GPIO.output(PIN, GPIO.LOW)
+                   print "GPIO is low"
                    break
    
             if command=='L' or command == 'R':
-                time.sleep(20)
+                print "wait for turning."
+                time.sleep(15)
+        #    time.sleep(5)
         #signal = 'f'
         # If MCU says if finishes
         # TODO: check if too long time without a signal
@@ -95,6 +102,7 @@ while 1:
             # Reaches target. Send position update to client
             sendLoc = currentLoc[0]*NUMCOL + currentLoc[1]
             conn.send(str(sendLoc))
+            print "send loc to client"
             # Receive ACK from client
             conn.settimeout(0.0)
             error_tolerance = 0
@@ -120,7 +128,7 @@ while 1:
                 conn.close()
                 break
             if currentLoc == destination and abs(currentDis[0]) < 5:
-                print "Connection is dropped."
+                print "Finished. Connection is dropped."
                 conn.close()
                 break
 
