@@ -113,15 +113,23 @@ class TagCamera(object):
         im = Image.open('mysample.jpg')
         enh = IE.Color(im)
         im_2 = enh.enhance(0)
-        wb = IE.Contrast(im_2)
-        im_3 = wb.enhance(9)
-        im_3.save('mysample.ppm')
+        im_2 = save('mysample.ppm')
         val = tagInfo('mysample.ppm')
         succeed = val[0]
         ID = val[1]
         width = val[2]
         height = val[3]
         angle = val[4]
+        if not succeed:
+            wb = IE.Contrast(im_2)
+            im_3 = wb.enhance(9)
+            im_3.save('mysample1.ppm')
+            val = tagInfo('mysample.ppm')
+            succeed = val[0]
+            ID = val[1]
+            width = val[2]
+            height = val[3]
+            angle = val[4]
         return succeed, ID, angle, (width, height)
 
     def getTagInfo(self):
