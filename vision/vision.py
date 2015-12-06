@@ -88,9 +88,9 @@ def readNextCommand(path, currentLoc, currentAngle, currentDis):
         else:
             print "current direction is: "+currDir+". Direction does not match."
             # case: small forward
-            if currentDis[0] < -5:
+            if currentDis[1] < -15:
                 command = 'B' # B is going forward a bit
-            elif currentDis[0] > 5:
+            elif currentDis[1] > 15:
                 command = 'C' # C is going backwards a bit
             elif path!="":
             # case: turning
@@ -113,7 +113,7 @@ class TagCamera(object):
         im = Image.open('mysample.jpg')
         enh = IE.Color(im)
         im_2 = enh.enhance(0)
-        im_2 = save('mysample.ppm')
+        im_2.save('mysample.ppm')
         val = tagInfo('mysample.ppm')
         succeed = val[0]
         ID = val[1]
@@ -124,7 +124,7 @@ class TagCamera(object):
             wb = IE.Contrast(im_2)
             im_3 = wb.enhance(9)
             im_3.save('mysample1.ppm')
-            val = tagInfo('mysample.ppm')
+            val = tagInfo('mysample1.ppm')
             succeed = val[0]
             ID = val[1]
             width = val[2]
