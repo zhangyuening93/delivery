@@ -84,7 +84,7 @@ while 1:
         # if command=='L' or command == 'R':
         if idx == 5:
             sys.exit(0)
-        time.sleep(20)
+        time.sleep(3)
 
         #signal = 'f'
         # If MCU says if finishes
