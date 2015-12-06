@@ -1,4 +1,5 @@
 from PIL import Image
+from PIL import ImageEnhance as IE
 from picamera import PiCamera
 from tagInfo import *
 import time
@@ -110,7 +111,11 @@ class TagCamera(object):
     def CaptureTag(self):
         self._camera.capture('mysample.jpg')
         im = Image.open('mysample.jpg')
-        im.save('mysample.ppm')
+        enh = IE.Color(im)
+        im_2 = enh.enhance(0)
+        wb = IE.Contrast(im_2)
+        im_3 = wb.enhance(9)
+        im_3.save('mysample.ppm')
         val = tagInfo('mysample.ppm')
         succeed = val[0]
         ID = val[1]
