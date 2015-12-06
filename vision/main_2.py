@@ -9,7 +9,7 @@ import RPi.GPIO as GPIO
 
 PIN  = 18
 # Define some parameters
-HOST = '35.2.109.158'
+HOST = '35.2.34.87'
 
 # Upon powering up, run main.py
 print "Program starts."

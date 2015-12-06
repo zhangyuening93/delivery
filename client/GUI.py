@@ -7,8 +7,8 @@ import time
 import errno
 import math
 
-NUMCOL = 10
-NUMROW = 20
+NUMCOL = 5
+NUMROW = 5
 INIT_X = 0
 INIT_Y = 0
 
@@ -162,7 +162,7 @@ class AppTask(object):
 
 if __name__=="__main__":
     # Initial socket
-    HOST = socket.gethostname()    # The remote host
+    HOST = '35.2.34.87'    # The remote host
     PORT = 50007              # The same port as used by the server
 
     # Initial App
