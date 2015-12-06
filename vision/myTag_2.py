@@ -1,6 +1,7 @@
 from tagInfo import *
 from picamera import PiCamera
 from PIL import Image
+from PIL import ImageEnhance as IE
 import time
 # import numpy as np
 import argparse
@@ -36,7 +37,11 @@ with PiCamera() as camera:
 		print mytime
 		mytime = time.time()
 		im = Image.open("mysample.jpg")
-		im.save("mysample.ppm")
+		enh = IE.Color(im)
+		im_2 = enh.enhance(0)
+		wb = IE.Contrast(im_2)
+		im_3 = wb.enhance(9)
+		im_3.save("mysample.ppm")
 		mytime = time.time() - mytime
 		print mytime
 		mytime = time.time()
