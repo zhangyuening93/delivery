@@ -103,7 +103,7 @@ def readNextCommand(path, currentLoc, currentAngle, currentDis):
                 elif error < -5:
                     command = 'E'
                 else:
-                    command = getLRCommand(currDir, path[0]，currentAngle)
+                    command = getLRCommand(currDir, path[0])
             else:
                 command = 'S'
             return command
