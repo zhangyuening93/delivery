@@ -24,16 +24,20 @@ def getDirection(value):
     # if 1, then direction is correct, otherwise, correct direction
     # original value is -180~180
     value = value + 180
-    if abs(value-E_ANGLE)<20:
-        return 1, 'e'
-    elif abs(value-N_ANGLE)<20:
-        return 1, 'n'
-    elif abs(value-S_ANGLE)<20 or abs(value-S_ANGLE)>340:
-        return 1, 's'
-    elif abs(value-W_ANGLE)<20:
-        return 1, 'w'
+    if abs(value-E_ANGLE)<45:
+        return 1, 'e', value-E_ANGLE
+    elif abs(value-N_ANGLE)<45:
+        return 1, 'n', value-N_ANGLE
+    elif abs(value-S_ANGLE)<45 or abs(value-S_ANGLE)>315:
+        if abs(value-S_ANGLE) < 45:
+            return 1, 's', value-S_ANGLE
+        else:
+            return 1, 's', value-S_ANGLE-360
+    elif abs(value-W_ANGLE)<45:
+        return 1, 'w', value-W_ANGLE
     else:
-        return 0, 'b'
+        # Should not happen anymore
+        return 0, 'b', 0
 
 # def updateLoc(currentLoc, currDir, offset):
 #     if currDir == 's':
@@ -78,7 +82,7 @@ def decodeLoc(value):
 def readNextCommand(path, currentLoc, currentAngle, currentDis):
     # return the next command and the next location
     # At first, idx = 0
-    suc, currDir = getDirection(currentAngle)
+    suc, currDir,error = getDirection(currentAngle)
     # TODO: Need to check distance.
     if suc:
         if path != "" and path[0] == currDir:
@@ -94,7 +98,12 @@ def readNextCommand(path, currentLoc, currentAngle, currentDis):
                 command = 'C' # C is going backwards a bit
             elif path!="":
             # case: turning
-                command = getLRCommand(currDir, path[0])
+                if error > 5:
+                    command = 'D'
+                elif error < -5:
+                    command = 'E'
+                else:
+                    command = getLRCommand(currDir, path[0]，currentAngle)
             else:
                 command = 'S'
             return command
