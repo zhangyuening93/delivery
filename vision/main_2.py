@@ -78,7 +78,9 @@ while 1:
    
             if command=='L' or command == 'R':
                 print "wait for turning."
-                time.sleep(15)
+                time.sleep(11)
+            if command=='B' or command == 'C':
+                time.sleep(1)
         #    time.sleep(5)
         #signal = 'f'
         # If MCU says if finishes

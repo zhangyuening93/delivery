@@ -88,9 +88,9 @@ def readNextCommand(path, currentLoc, currentAngle, currentDis):
         else:
             print "current direction is: "+currDir+". Direction does not match."
             # case: small forward
-            if currentDis[1] < -15:
+            if currentDis[1] < -2:
                 command = 'B' # B is going forward a bit
-            elif currentDis[1] > 15:
+            elif currentDis[1] > 2:
                 command = 'C' # C is going backwards a bit
             elif path!="":
             # case: turning
