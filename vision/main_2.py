@@ -79,7 +79,7 @@ while 1:
                         ser.write('4')
                     elif currenDis[1] > 1.6 and currenDis[1] <= 2:
                         ser.write('5')
-                else
+                else:
                     ser.write('0')
                 print "command has been written."
                 signal = ser.read()
