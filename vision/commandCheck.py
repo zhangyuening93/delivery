@@ -76,6 +76,19 @@ while 1:
         GPIO.output(PIN, GPIO.HIGH)
         while 1:
             ser.write(command)
+            if command == 'B' or command == 'C':
+                if currentDis[1] <= 0.4:
+                    ser.write('1')
+                elif currenDis[1] > 0.4 and currenDis[1] <= 0.8:
+                    ser.write('2')
+                elif currenDis[1] > 0.8 and currenDis[1] <= 1.2:
+                    ser.write('3')
+                elif currenDis[1] > 1.2 and currenDis[1] <= 1.6:
+                    ser.write('4')
+                elif currenDis[1] > 1.6 and currenDis[1] <= 2:
+                    ser.write('5')
+            else:
+                ser.write('0')
             signal = ser.read()
             if signal == command:
                GPIO.output(PIN, GPIO.LOW)
