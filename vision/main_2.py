@@ -67,24 +67,58 @@ while 1:
             print "GPIO is high"
             GPIO.output(PIN, GPIO.HIGH)
             while 1:
-                ser.write(command)
-                if command == 'B' or command == 'C':
-                    if currentDis[1] <= 0.4:
-                        ser.write('1')
-                    elif currenDis[1] > 0.4 and currenDis[1] <= 0.8:
-                        ser.write('2')
-                    elif currenDis[1] > 0.8 and currenDis[1] <= 1.2:
-                        ser.write('3')
-                    elif currenDis[1] > 1.2 and currenDis[1] <= 1.6:
-                        ser.write('4')
-                    elif currenDis[1] > 1.6 and currenDis[1] <= 2:
-                        ser.write('5')
-                else:
-                    ser.write('0')
-                print "command has been written."
+  #              ser.write(command)
+  #	print "command:" + command + "was just written"
+#		rev_signal = ser.read()
+#		print "Received:" + rev_signal
+ #               time.sleep(0.1)
+		if command == 'B':
+                    if currentDis[0] <= 0.4:
+                        ser.write('B')
+			ha = 'B'
+			#print "1 was just written"
+                    elif currentDis[0] > 0.4 and currentDis[0] <= 0.8:
+                        ser.write('C')
+			ha = 'C'
+			#print "2 was just written"
+                    elif currentDis[0] > 0.8 and currentDis[0] <= 1.2:
+                        ser.write('D')
+			ha = 'D'
+			#print "3 was just written"
+                    elif currentDis[0] > 1.2 and currentDis[0] <= 1.6:
+                        ser.write('E')
+			ha = 'E'
+			#print "4 was just written"
+                    elif currentDis[0] > 1.6 and currentDis[0] <= 2:
+                        ser.write('F')
+			ha = 'F'
+			#print "5 was just written"
+                elif command == 'C':
+                    if currentDis[0] >= -0.4:
+                        ser.write('G')
+                        ha = 'G'
+                    elif currentDis[0] < -0.4 and currentDis[0] >= -0.8:
+                        ser.write('H')
+ 			ha  = 'H'
+		    elif currentDis[0] < -0.8 and currentDis[0] >= -1.2:
+			ser.write('I')
+			ha = 'I'
+		    elif currentDis[0] < -1.2 and currentDis[0] >= -1.6:
+ 		        ser.write('J')
+                        ha = 'J'
+                    elif currentDis[0] < -1.6 and currentDis[0] >= -2:
+                        ser.write('K')
+                        ha = 'K'
+		else:
+                    ser.write(command)
+		    ha = command
+		    #print "0 was just written"
+                print "command" + ha +"  has been written."
                 signal = ser.read()
                 print "ACK received."
-                if signal == command:
+		print "signal:" + signal
+		#print "command:" + command
+                if signal  == ha:
                    GPIO.output(PIN, GPIO.LOW)
                    print "GPIO is low"
                    break

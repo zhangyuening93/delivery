@@ -13,10 +13,10 @@ import sys
 NUMCOL = 5
 CENTER_X = 320
 CENTER_Y = 240
-E_ANGLE = 270
-N_ANGLE = 180
-W_ANGLE = 90
-S_ANGLE = 0
+E_ANGLE = 0
+N_ANGLE = 270
+W_ANGLE = 180
+S_ANGLE = 90
 
 
 def getDirection(value):
@@ -24,15 +24,15 @@ def getDirection(value):
     # if 1, then direction is correct, otherwise, correct direction
     # original value is -180~180
     value = value + 180
-    if abs(value-E_ANGLE)<45:
-        return 1, 'e', value-E_ANGLE
+    if abs(value-S_ANGLE)<45:
+        return 1, 'e', value-S_ANGLE
     elif abs(value-N_ANGLE)<45:
         return 1, 'n', value-N_ANGLE
-    elif abs(value-S_ANGLE)<45 or abs(value-S_ANGLE)>315:
-        if abs(value-S_ANGLE) < 45:
-            return 1, 's', value-S_ANGLE
+    elif abs(value-E_ANGLE)<45 or abs(value-E_ANGLE)>315:
+        if abs(value-E_ANGLE) < 45:
+            return 1, 's', value-E_ANGLE
         else:
-            return 1, 's', value-S_ANGLE-360
+            return 1, 's', value-E_ANGLE-360
     elif abs(value-W_ANGLE)<45:
         return 1, 'w', value-W_ANGLE
     else:
@@ -92,9 +92,9 @@ def readNextCommand(path, currentLoc, currentAngle, currentDis):
         else:
             print "current direction is: "+currDir+". Direction does not match."
             # case: small forward
-            if currentDis[1] < -2:
+            if currentDis[0] < -2:
                 command = 'B' # B is going forward a bit
-            elif currentDis[1] > 2:
+            elif currentDis[0] > 2:
                 command = 'C' # C is going backwards a bit
             elif path!="":
             # case: turning
