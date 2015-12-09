@@ -10,13 +10,13 @@ import sys
 
 # Define
 # DEBUG = 1
-NUMCOL = 5
+NUMCOL = 6
 CENTER_X = 320
 CENTER_Y = 240
-E_ANGLE = 0
-N_ANGLE = 270
-W_ANGLE = 180
-S_ANGLE = 90
+E_ANGLE = 180
+N_ANGLE = 90
+W_ANGLE = 0
+S_ANGLE = 270
 
 
 def getDirection(value):
@@ -25,16 +25,16 @@ def getDirection(value):
     # original value is -180~180
     value = value + 180
     if abs(value-S_ANGLE)<45:
-        return 1, 'e', value-S_ANGLE
+        return 1, 's', value-S_ANGLE
     elif abs(value-N_ANGLE)<45:
         return 1, 'n', value-N_ANGLE
-    elif abs(value-E_ANGLE)<45 or abs(value-E_ANGLE)>315:
-        if abs(value-E_ANGLE) < 45:
-            return 1, 's', value-E_ANGLE
+    elif abs(value-W_ANGLE)<45 or abs(value-W_ANGLE)>315:
+        if abs(value-W_ANGLE) < 45:
+            return 1, 'w', value-W_ANGLE
         else:
-            return 1, 's', value-E_ANGLE-360
-    elif abs(value-W_ANGLE)<45:
-        return 1, 'w', value-W_ANGLE
+            return 1, 'w', value-W_ANGLE-360
+    elif abs(value-E_ANGLE)<45:
+        return 1, 'e', value-E_ANGLE
     else:
         # Should not happen anymore
         return 0, 'b', 0
@@ -99,9 +99,9 @@ def readNextCommand(path, currentLoc, currentAngle, currentDis):
             elif path!="":
             # case: turning
                 if error > 5:
-                    command = 'D'
+                    command = 'M'
                 elif error < -5:
-                    command = 'E'
+                    command = 'T'
                 else:
                     command = getLRCommand(currDir, path[0])
             else:

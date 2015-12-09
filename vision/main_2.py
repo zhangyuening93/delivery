@@ -72,43 +72,43 @@ while 1:
 #		rev_signal = ser.read()
 #		print "Received:" + rev_signal
  #               time.sleep(0.1)
-		if command == 'B':
-                    if currentDis[0] <= 0.4:
-                        ser.write('B')
-			ha = 'B'
-			#print "1 was just written"
-                    elif currentDis[0] > 0.4 and currentDis[0] <= 0.8:
-                        ser.write('C')
-			ha = 'C'
-			#print "2 was just written"
-                    elif currentDis[0] > 0.8 and currentDis[0] <= 1.2:
-                        ser.write('D')
-			ha = 'D'
-			#print "3 was just written"
-                    elif currentDis[0] > 1.2 and currentDis[0] <= 1.6:
-                        ser.write('E')
-			ha = 'E'
-			#print "4 was just written"
-                    elif currentDis[0] > 1.6 and currentDis[0] <= 2:
-                        ser.write('F')
-			ha = 'F'
-			#print "5 was just written"
-                elif command == 'C':
-                    if currentDis[0] >= -0.4:
+		if command == 'C':
+                    if currentDis[0] > 2 and currentDis[0] <=4:
                         ser.write('G')
-                        ha = 'G'
-                    elif currentDis[0] < -0.4 and currentDis[0] >= -0.8:
+			ha = 'G'
+			#print "1 was just written"
+                    elif currentDis[0] > 4 and currentDis[0] <= 8:
                         ser.write('H')
- 			ha  = 'H'
-		    elif currentDis[0] < -0.8 and currentDis[0] >= -1.2:
-			ser.write('I')
+			ha = 'H'
+			#print "2 was just written"
+                    elif currentDis[0] > 8 and currentDis[0] <= 12:
+                        ser.write('I')
 			ha = 'I'
-		    elif currentDis[0] < -1.2 and currentDis[0] >= -1.6:
- 		        ser.write('J')
-                        ha = 'J'
-                    elif currentDis[0] < -1.6 and currentDis[0] >= -2:
+			#print "3 was just written"
+                    elif currentDis[0] > 12 and currentDis[0] <= 16:
+                        ser.write('J')
+			ha = 'J'
+			#print "4 was just written"
+                    elif currentDis[0] > 16:
                         ser.write('K')
-                        ha = 'K'
+			ha = 'K'
+			#print "5 was just written"
+                elif command == 'B':
+                    if currentDis[0] < -2 and  currentDis[0] >= -4:
+                        ser.write('B')
+                        ha = 'B'
+                    elif currentDis[0] < -4 and currentDis[0] >= -8:
+                        ser.write('C')
+ 			ha  = 'C'
+		    elif currentDis[0] < -8 and currentDis[0] >= -12:
+			ser.write('D')
+			ha = 'D'
+		    elif currentDis[0] < -12 and currentDis[0] >= -16:
+ 		        ser.write('E')
+                        ha = 'E'
+                    elif currentDis[0] < -16:
+                        ser.write('F')
+                        ha = 'F'
 		else:
                     ser.write(command)
 		    ha = command

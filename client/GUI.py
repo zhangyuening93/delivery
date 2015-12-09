@@ -7,8 +7,8 @@ import time
 import errno
 import math
 
-NUMCOL = 5
-NUMROW = 5
+NUMCOL = 6
+NUMROW = 7
 INIT_X = 0
 INIT_Y = 0
 
