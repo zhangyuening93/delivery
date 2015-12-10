@@ -114,11 +114,23 @@ while 1:
                     ha = command
                     #print "0 was just written"
                 print "command" + ha +"  has been written."
-                signal = ser.read()
-                print "ACK received."
-                print "signal:" + signal
-                #print "command:" + command
-                if signal  == ha:
+                flag = 0
+                while 1:
+                    print "Check if there is value."
+                    if ser.in_waiting:
+                        print "There is value now."
+                        signal = ser.read()
+                        print "ACK received."
+                        print "signal:" + signal
+                        break
+                    elif counter > 100000:
+                        print "No ACK received"
+                        signal = " "
+                        flag = 1
+                        break
+                    counter = counter + 1
+
+                if signal == ha or flag == 1:
                    GPIO.output(PIN, GPIO.LOW)
                    print "GPIO is low"
                    break
@@ -140,10 +152,23 @@ while 1:
                                 ser.write(command)
                                 # ha = command
                                 print "command" + command +"  has been written."
-                                signal = ser.read()
-                                print "ACK received."
-                                print "signal:" + signal
-                                if signal  == command:
+                                flag = 0
+                                while 1:
+                                    print "Check if there is value."
+                                    if ser.in_waiting:
+                                        print "There is value now."
+                                        signal = ser.read()
+                                        print "ACK received."
+                                        print "signal:" + signal
+                                        break
+                                    elif counter > 100000:
+                                        print "No ACK received"
+                                        signal = " "
+                                        flag = 1
+                                        break
+                                    counter = counter + 1
+
+                                if signal == ha or flag == 1:
                                    GPIO.output(PIN, GPIO.LOW)
                                    print "GPIO is low"
                                    break
@@ -157,10 +182,23 @@ while 1:
                                 ser.write(command)
                                 # ha = command
                                 print "command" + command +"  has been written."
-                                signal = ser.read()
-                                print "ACK received."
-                                print "signal:" + signal
-                                if signal  == command:
+                                flag = 0
+                                while 1:
+                                    print "Check if there is value."
+                                    if ser.in_waiting:
+                                        print "There is value now."
+                                        signal = ser.read()
+                                        print "ACK received."
+                                        print "signal:" + signal
+                                        break
+                                    elif counter > 100000:
+                                        print "No ACK received"
+                                        signal = " "
+                                        flag = 1
+                                        break
+                                    counter = counter + 1
+
+                                if signal == ha or flag == 1:
                                    GPIO.output(PIN, GPIO.LOW)
                                    print "GPIO is low"
                                    break
