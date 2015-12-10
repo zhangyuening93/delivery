@@ -138,9 +138,10 @@ class AppTask(object):
                 self.root.after(500, self.getUpdate)
             else:
                 # a "real" error occurred
-                print "I think connect is broken."
+                print "I think connection is broken. Will keep updating."
                 print e
-                sys.exit(1)
+                # sys.exit(1)
+                self.root.after(500, self.getUpdate)
                 
         else:
             if data == "":
@@ -166,7 +167,7 @@ class AppTask(object):
                 self.app.updatePosition()
                 msg = "Current position at ("+str(self.app.pos_x)+', '+str(self.app.pos_y)+").\n"
                 self.app.insertMsg(msg)
-                self.s.send(b'y')
+                # self.s.send(b'y')
                 self.root.after(500, self.getUpdate)
 
 
