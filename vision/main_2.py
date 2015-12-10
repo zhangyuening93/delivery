@@ -67,12 +67,12 @@ while 1:
             GPIO.output(PIN, GPIO.LOW)
             print "GPIO is high"
             GPIO.output(PIN, GPIO.HIGH)
+            time.sleep(0.1)
             while 1:
   #              ser.write(command)
   #     print "command:" + command + "was just written"
 #               rev_signal = ser.read()
 #               print "Received:" + rev_signal
- #               time.sleep(0.1)
                 ser.write(command)
                 # ha = command
                     #print "0 was just written"
@@ -84,7 +84,7 @@ while 1:
                     try:
                         signal = ser.read()
                     except:
-                        if error_tolerance = 5:
+                        if error_tolerance == 5:
                             continue_flag = 1
                             print "No ACK received."
                             break
@@ -131,7 +131,7 @@ while 1:
                                     try:
                                         signal = ser.read()
                                     except:
-                                        if error_tolerance = 5:
+                                        if error_tolerance == 5:
                                             continue_flag = 1
                                             print "No ACK received."
                                             break
@@ -170,7 +170,7 @@ while 1:
                                     try:
                                         signal = ser.read()
                                     except:
-                                        if error_tolerance = 5:
+                                        if error_tolerance == 5:
                                             continue_flag = 1
                                             print "No ACK received."
                                             break
