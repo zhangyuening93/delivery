@@ -23,6 +23,7 @@ print "Server is on."
 # Initialize uart
 usbport = '/dev/ttyAMA0'
 ser = serial.Serial(usbport, 9600)
+ser.timeout = 5
 print "Uart established."
 
 # Initialize camera
@@ -72,65 +73,35 @@ while 1:
 #               rev_signal = ser.read()
 #               print "Received:" + rev_signal
  #               time.sleep(0.1)
-                if command == 'C':
-                    if currentDis[0] > 2 and currentDis[0] <=4:
-                        ser.write('G')
-                        ha = 'G'
-                        #print "1 was just written"
-                    elif currentDis[0] > 4 and currentDis[0] <= 8:
-                        ser.write('H')
-                        ha = 'H'
-                        #print "2 was just written"
-                    elif currentDis[0] > 8 and currentDis[0] <= 12:
-                        ser.write('I')
-                        ha = 'I'
-                        #print "3 was just written"
-                    elif currentDis[0] > 12 and currentDis[0] <= 16:
-                        ser.write('J')
-                        ha = 'J'
-                        #print "4 was just written"
-                    elif currentDis[0] > 16:
-                        ser.write('K')
-                        ha = 'K'
-                        #print "5 was just written"
-                elif command == 'B':
-                    if currentDis[0] < -2 and  currentDis[0] >= -4:
-                        ser.write('B')
-                        ha = 'B'
-                    elif currentDis[0] < -4 and currentDis[0] >= -8:
-                        ser.write('C')
-                        ha  = 'C'
-                    elif currentDis[0] < -8 and currentDis[0] >= -12:
-                        ser.write('D')
-                        ha = 'D'
-                    elif currentDis[0] < -12 and currentDis[0] >= -16:
-                        ser.write('E')
-                        ha = 'E'
-                    elif currentDis[0] < -16:
-                        ser.write('F')
-                        ha = 'F'
-                else:
-                    ser.write(command)
-                    ha = command
+                ser.write(command)
+                # ha = command
                     #print "0 was just written"
-                print "command" + ha +"  has been written."
-                flag = 0
+                print "command" + command +"  has been written."
+                error_tolerance = 0
+                continue_flag = 0
                 while 1:
-                    print "Check if there is value."
-                    if ser.in_waiting:
-                        print "There is value now."
+                    print "Try to read."
+                    try:
                         signal = ser.read()
+                    except:
+                        if error_tolerance = 5:
+                            continue_flag = 1
+                            print "No ACK received."
+                            break
+                        else:
+                            error_tolerance = error_tolerance + 1
+                            break
+                    else:
                         print "ACK received."
                         print "signal:" + signal
+                        if signal == command:
+                            continue_flag = 1
+                            print "ACK is correct."
+                        else:
+                            print "ACK is incorrect."
                         break
-                    elif counter > 100000:
-                        print "No ACK received"
-                        signal = " "
-                        flag = 1
-                        break
-                    counter = counter + 1
 
-                if signal == ha or flag == 1:
+                if continue_flag == 1:
                    GPIO.output(PIN, GPIO.LOW)
                    print "GPIO is low"
                    break
@@ -151,24 +122,33 @@ while 1:
                             while 1:
                                 ser.write(command)
                                 # ha = command
+                                    #print "0 was just written"
                                 print "command" + command +"  has been written."
-                                flag = 0
+                                error_tolerance = 0
+                                continue_flag = 0
                                 while 1:
-                                    print "Check if there is value."
-                                    if ser.in_waiting:
-                                        print "There is value now."
+                                    print "Try to read."
+                                    try:
                                         signal = ser.read()
+                                    except:
+                                        if error_tolerance = 5:
+                                            continue_flag = 1
+                                            print "No ACK received."
+                                            break
+                                        else:
+                                            error_tolerance = error_tolerance + 1
+                                            break
+                                    else:
                                         print "ACK received."
                                         print "signal:" + signal
+                                        if signal == command:
+                                            continue_flag = 1
+                                            print "ACK is correct."
+                                        else:
+                                            print "ACK is incorrect."
                                         break
-                                    elif counter > 100000:
-                                        print "No ACK received"
-                                        signal = " "
-                                        flag = 1
-                                        break
-                                    counter = counter + 1
 
-                                if signal == ha or flag == 1:
+                                if continue_flag == 1:
                                    GPIO.output(PIN, GPIO.LOW)
                                    print "GPIO is low"
                                    break
@@ -181,24 +161,33 @@ while 1:
                             while 1:
                                 ser.write(command)
                                 # ha = command
+                                    #print "0 was just written"
                                 print "command" + command +"  has been written."
-                                flag = 0
+                                error_tolerance = 0
+                                continue_flag = 0
                                 while 1:
-                                    print "Check if there is value."
-                                    if ser.in_waiting:
-                                        print "There is value now."
+                                    print "Try to read."
+                                    try:
                                         signal = ser.read()
+                                    except:
+                                        if error_tolerance = 5:
+                                            continue_flag = 1
+                                            print "No ACK received."
+                                            break
+                                        else:
+                                            error_tolerance = error_tolerance + 1
+                                            break
+                                    else:
                                         print "ACK received."
                                         print "signal:" + signal
+                                        if signal == command:
+                                            continue_flag = 1
+                                            print "ACK is correct."
+                                        else:
+                                            print "ACK is incorrect."
                                         break
-                                    elif counter > 100000:
-                                        print "No ACK received"
-                                        signal = " "
-                                        flag = 1
-                                        break
-                                    counter = counter + 1
 
-                                if signal == ha or flag == 1:
+                                if continue_flag == 1:
                                    GPIO.output(PIN, GPIO.LOW)
                                    print "GPIO is low"
                                    break

@@ -93,9 +93,48 @@ def readNextCommand(path, currentLoc, currentAngle, currentDis):
             print "current direction is: "+currDir+". Direction does not match."
             # case: small forward
             if currentDis[0] < -2:
-                command = 'B' # B is going forward a bit
+                # command = 'B' # B is going forward a bit
+            # elif command == 'B':
+                if currentDis[0] < -2 and  currentDis[0] >= -4:
+                    # ser.write('B')
+                    command = 'B'
+                elif currentDis[0] < -4 and currentDis[0] >= -8:
+                    # ser.write('C')
+                    command  = 'C'
+                elif currentDis[0] < -8 and currentDis[0] >= -12:
+                    # ser.write('D')
+                    command = 'D'
+                elif currentDis[0] < -12 and currentDis[0] >= -16:
+                    # ser.write('E')
+                    command = 'E'
+                # elif currentDis[0] < -16:
+                else:
+                    # ser.write('F')
+                    command = 'F'
             elif currentDis[0] > 2:
-                command = 'C' # C is going backwards a bit
+                # command = 'C' # C is going backwards a bit
+            # if command == 'C':
+                if currentDis[0] > 2 and currentDis[0] <=4:
+                    # ser.write('G')
+                    command = 'G'
+                    #print "1 was just written"
+                elif currentDis[0] > 4 and currentDis[0] <= 8:
+                    # ser.write('H')
+                    command = 'H'
+                    #print "2 was just written"
+                elif currentDis[0] > 8 and currentDis[0] <= 12:
+                    # ser.write('I')
+                    command = 'I'
+                    #print "3 was just written"
+                elif currentDis[0] > 12 and currentDis[0] <= 16:
+                    # ser.write('J')
+                    command = 'J'
+                    #print "4 was just written"
+                # elif currentDis[0] > 16:
+                else:
+                    # ser.write('K')
+                    command = 'K'
+                    #print "5 was just written"
             elif path!="":
             # case: turning
                 if error > 5:
