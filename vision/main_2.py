@@ -170,8 +170,8 @@ while 1:
                         print "error[2]"
                         sys.exit(1)
 
-            if command=='B' or command == 'C':
-                time.sleep(1)
+            # if command=='B' or command == 'C':
+            #     time.sleep(1)
         #    time.sleep(5)
         #signal = 'f'
         # If MCU says if finishes
@@ -197,29 +197,29 @@ while 1:
             conn.send(str(sendLoc))
             print "send loc to client"
             # Receive ACK from client
-            conn.settimeout(0.0)
-            error_tolerance = 0
-            for x in xrange(5):
-                try:
-                    time.sleep(0.3)
-                    signal = conn.recv(1024)
-                except socket.error, e:
-                    err = e.args[0]
-                    if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
-                        print 'try again'
-                        error_tolerance = error_tolerance + 1
-                    else:
-                        print e
-                        sys.exit(1)
-                else: 
-                    if signal == 'y':
-                        break
+            # conn.settimeout(0.0)
+            # error_tolerance = 0
+            # for x in xrange(5):
+            #     try:
+            #         time.sleep(0.3)
+            #         signal = conn.recv(1024)
+            #     except socket.error, e:
+            #         err = e.args[0]
+            #         if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
+            #             print 'try again'
+            #             error_tolerance = error_tolerance + 1
+            #         else:
+            #             print e
+            #             sys.exit(1)
+            #     else: 
+            #         if signal == 'y':
+            #             break
             # Drop connection when reaches destination
             # or does not receive connection from client
-            if error_tolerance == 5:
-                print "Connection is dropped."
-                conn.close()
-                break
+            # if error_tolerance == 5:
+            #     print "Connection is dropped."
+            #     conn.close()
+            #     break
             if currentLoc == destination and abs(currentDis[0]) < 5:
                 print "Finished. Connection is dropped."
                 conn.close()
